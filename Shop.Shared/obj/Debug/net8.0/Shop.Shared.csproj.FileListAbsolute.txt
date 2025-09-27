@@ -1,0 +1,12 @@
+C:\Users\Emilis\Desktop\shop\Shop.Shared\bin\Debug\net8.0\Shop.Shared.deps.json
+C:\Users\Emilis\Desktop\shop\Shop.Shared\bin\Debug\net8.0\Shop.Shared.dll
+C:\Users\Emilis\Desktop\shop\Shop.Shared\bin\Debug\net8.0\Shop.Shared.pdb
+C:\Users\Emilis\Desktop\shop\Shop.Shared\obj\Debug\net8.0\Shop.Shared.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Emilis\Desktop\shop\Shop.Shared\obj\Debug\net8.0\Shop.Shared.AssemblyInfoInputs.cache
+C:\Users\Emilis\Desktop\shop\Shop.Shared\obj\Debug\net8.0\Shop.Shared.AssemblyInfo.cs
+C:\Users\Emilis\Desktop\shop\Shop.Shared\obj\Debug\net8.0\Shop.Shared.csproj.CoreCompileInputs.cache
+C:\Users\Emilis\Desktop\shop\Shop.Shared\obj\Debug\net8.0\Shop.Shared.sourcelink.json
+C:\Users\Emilis\Desktop\shop\Shop.Shared\obj\Debug\net8.0\Shop.Shared.dll
+C:\Users\Emilis\Desktop\shop\Shop.Shared\obj\Debug\net8.0\refint\Shop.Shared.dll
+C:\Users\Emilis\Desktop\shop\Shop.Shared\obj\Debug\net8.0\Shop.Shared.pdb
+C:\Users\Emilis\Desktop\shop\Shop.Shared\obj\Debug\net8.0\ref\Shop.Shared.dll

@@ -1767,6 +1767,16 @@
             "rid": "win"
           }
         }
+      },
+      "Shop.Shared/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "compile": {
+          "bin/placeholder/Shop.Shared.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Shop.Shared.dll": {}
+        }
       }
     }
   },
@@ -4763,6 +4773,11 @@
         "system.windows.extensions.nuspec",
         "useSharedDesignerContext.txt"
       ]
+    },
+    "Shop.Shared/1.0.0": {
+      "type": "project",
+      "path": "../Shop.Shared/Shop.Shared.csproj",
+      "msbuildProject": "../Shop.Shared/Shop.Shared.csproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -4771,6 +4786,7 @@
       "Microsoft.EntityFrameworkCore.Design >= 8.0.10",
       "Microsoft.EntityFrameworkCore.SqlServer >= 8.0.10",
       "Microsoft.EntityFrameworkCore.Sqlite >= 8.0.10",
+      "Shop.Shared >= 1.0.0",
       "Swashbuckle.AspNetCore >= 6.5.0"
     ]
   },
@@ -4806,7 +4822,11 @@
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\Users\\Emilis\\Desktop\\shop\\Shop.Shared\\Shop.Shared.csproj": {
+              "projectPath": "C:\\Users\\Emilis\\Desktop\\shop\\Shop.Shared\\Shop.Shared.csproj"
+            }
+          }
         }
       },
       "warningProperties": {

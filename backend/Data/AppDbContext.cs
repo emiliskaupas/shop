@@ -1,19 +1,32 @@
 using Microsoft.EntityFrameworkCore;
-using Backend.Models;
-namespace Backend.Data;
+using backend.Models;
+using backend.Models.Enums;
+namespace backend.Data;
 
 public class AppDbContext : DbContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> opts) : base(opts) { }
+    
     public DbSet<Product> Products => Set<Product>();
-
-    // Seed
+    public DbSet<User> Users => Set<User>();
+    public DbSet<CartItem> CartItems => Set<CartItem>();
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder);
-        modelBuilder.Entity<Product>().HasData(
-            new Product { Id = 1, Name = "Chair", ShortDescription = "Simple chair", Price = 49.99m, ImageUrl = null },
-            new Product { Id = 2, Name = "Table", ShortDescription = "Small table", Price = 99.99m, ImageUrl = null }
-        );
+        // Configure User -> CartItems relationship (One-to-Many)
+        modelBuilder.Entity<User>()
+            .HasMany(u => u.CartItems)
+            .WithOne()
+            .HasForeignKey(ci => ci.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Configure Product -> CartItems relationship (One-to-Many)
+        modelBuilder.Entity<CartItem>()
+            .HasOne(ci => ci.Product)
+            .WithMany()
+            .HasForeignKey(ci => ci.ProductId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Seed();
     }
 }

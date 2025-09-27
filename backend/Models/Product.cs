@@ -1,10 +1,13 @@
-namespace Backend.Models;
+using backend.Models;
+using backend.Models.Enums;
 
-public class Product
+namespace backend.Models;
+
+public class Product : BaseEntity
 {
-    public int Id { get; set; }
     public string Name { get; set; } = "";
     public string ShortDescription { get; set; } = "";
     public decimal Price { get; set; }
     public string? ImageUrl { get; set; }
+    public ProductType ProductType { get; set; }
 }

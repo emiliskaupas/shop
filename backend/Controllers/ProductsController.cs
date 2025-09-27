@@ -1,33 +1,77 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Backend.Data;
-
-namespace Backend.Controllers;
+using backend.Data;
+using backend.Models;
+using backend.DTOs;
+using backend.Services;
+using Shop.Shared.Pagination;
+using Shop.Shared.Results;
+namespace backend.Controllers;
 
 
 [ApiController]
 [Route("api/[controller]")]
 public class ProductsController : ControllerBase
 {
-    private readonly AppDbContext _db;
-    public ProductsController(AppDbContext db) { _db = db; }
+    private readonly ProductService productService;
+
+    public ProductsController(ProductService productService)
+    {
+        this.productService = productService;
+    }
 
     [HttpGet]
-    public async Task<IActionResult> Get([FromQuery] int page = 1, [FromQuery] int pageSize = 12)
+    public async Task<IActionResult> GetProducts([FromQuery] PaginationRequest request)
     {
-        page = Math.Max(1, page);
-        pageSize = Math.Clamp(pageSize, 1, 100);
-        var query = _db.Products.AsNoTracking().OrderBy(p => p.Id);
-        var total = await query.CountAsync();
-        var items = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
-        return Ok(new { items, total, page, pageSize });
+        var result = await this.productService.GetProductsAsync(request);
+
+        if (!result.IsSuccess)
+            return BadRequest(new { error = result.ErrorMessage });
+
+        return Ok(result.Data);
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
+    public async Task<IActionResult> GetProductById(long id)
     {
-        var p = await _db.Products.FindAsync(id);
-        if (p == null) return NotFound();
-        return Ok(p);
+        var result = await this.productService.GetProductByIdAsync(id);
+
+        if (!result.IsSuccess)
+            return NotFound(new { error = result.ErrorMessage });
+
+        return Ok(result.Data);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> AddProduct([FromBody] CreateProductDto product)
+    {
+        var result = await this.productService.AddProductAsync(product);
+
+        if (!result.IsSuccess)
+            return BadRequest(new { error = result.ErrorMessage });
+
+        return CreatedAtAction(nameof(GetProductById), new { id = result.Data!.Id }, result.Data);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateProduct(long id, [FromBody] UpdateProductDto product)
+    {
+        var result = await this.productService.UpdateProductAsync(id, product);
+
+        if (!result.IsSuccess)
+            return BadRequest(new { error = result.ErrorMessage });
+
+        return Ok(result.Data);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteProduct(long id)
+    {
+        var result = await this.productService.DeleteProductAsync(id);
+
+        if (!result.IsSuccess)
+            return NotFound(new { error = result.ErrorMessage });
+
+        return NoContent();
     }
 }
