@@ -29,7 +29,7 @@ A modern full-stack e-commerce application built with .NET 8 Web API and React T
 
 3. **Database Setup & Seed Data:**
    - Connection string is set in `appsettings.Development.json`:
-     ```
+   
    - Seed data is automatically applied via EF Core migrations.
    - Run migrations:
      ```sh
