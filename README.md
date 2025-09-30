@@ -1,6 +1,6 @@
 # Shop Application - Full Stack E-Commerce Platform
 
-A modern full-stack e-commerce application built with .NET 8 Web API and React TypeScript, demonstrating best practices in architecture, state management, and user experience.
+A modern full-stack e-commerce application built with .NET 8 Web API and React TypeScript
 
 ---
 
@@ -30,10 +30,6 @@ A modern full-stack e-commerce application built with .NET 8 Web API and React T
 3. **Database Setup & Seed Data:**
    - Connection string is set in `appsettings.Development.json`:
      ```
-     "ConnectionStrings": {
-       "DefaultConnection": "Server=(localdb)\\MSSQLLocalDB;Database=ShopDB;Trusted_Connection=true;MultipleActiveResultSets=true;TrustServerCertificate=true"
-     }
-     ```
    - Seed data is automatically applied via EF Core migrations.
    - Run migrations:
      ```sh
@@ -42,11 +38,7 @@ A modern full-stack e-commerce application built with .NET 8 Web API and React T
 
 4. **Environment Variables:**
    - JWT secret key is set in `appsettings.Development.json`:
-     ```
-     "JwtSettings": {
-       "SecretKey": "your-very-long-secret-key-that-should-be-at-least-256-bits-long-for-security-purposes-in-production"
-     }
-     ```
+
    - You can override config values with environment variables if needed.
 
 5. **Start the API:**
