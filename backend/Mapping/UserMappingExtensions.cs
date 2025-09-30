@@ -1,6 +1,7 @@
 using backend.Models;
 using backend.Models.Enums;
 using backend.DTOs;
+using BCrypt.Net;
 
 namespace backend.Mapping;
 
@@ -18,14 +19,13 @@ public static class UserMappingExtensions
     }
 
     public static User ToEntity(this RegisterDto registerDto)
+{
+    return new User
     {
-        return new User
-        {
-            Username = registerDto.Username,
-            Email = registerDto.Email,
-            PasswordHash = registerDto.Password, // Convert: DTO.Password → Model.PasswordHash
-            //PasswordHash = BCrypt.HashPassword(registerDto.Password) // Hashing can be done here if needed
-            Role = UserRole.Customer
-        };
-    }
+        Username = registerDto.Username,
+        Email = registerDto.Email,
+        PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password), // Hash password here
+        Role = UserRole.Customer
+    };
+}
 }

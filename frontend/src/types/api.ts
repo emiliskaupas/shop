@@ -19,6 +19,12 @@ export interface UserDto {
   role: UserRole;
 }
 
+export interface LoginResponseDto {
+  user: UserDto;
+  token: string;
+  expiresAt: string;
+}
+
 // Product DTOs
 export interface ProductDto {
   id: number;
@@ -27,6 +33,11 @@ export interface ProductDto {
   price: number;
   imageUrl?: string;
   productType: ProductType;
+  createdByUserId: number;
+  createdByUserName: string;
+  createdByEmail: string;
+  createdAt: string;
+  modifiedAt?: string;
 }
 
 export interface CreateProductDto {
@@ -97,14 +108,22 @@ export interface NotificationStatus {
   lastUpdated?: string;
 }
 
-// API Response DTOs
-export interface ApiResponse<T> {
-  data?: T;
-  error?: string;
-  isSuccess: boolean;
-  errorMessage?: string;
+// API Response Types
+export interface ApiSuccessResponse<T> {
+  data: T;
+  success: true;
 }
 
-export interface ErrorResponse {
+export interface ApiErrorResponse {
   error: string;
+  success: false;
+}
+
+export type ApiResponse<T> = ApiSuccessResponse<T> | ApiErrorResponse;
+
+// Local Cart Item (for localStorage)
+export interface LocalCartItem {
+  productId: number;
+  quantity: number;
+  product?: ProductDto;
 }

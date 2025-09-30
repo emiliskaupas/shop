@@ -14,11 +14,16 @@ public static class ProductMappings
             ShortDescription = product.ShortDescription,
             Price = product.Price,
             ImageUrl = product.ImageUrl,
-            ProductType = product.ProductType
+            ProductType = product.ProductType,
+            CreatedByUserId = product.CreatedByUserId,
+            CreatedByUserName = product.CreatedBy.Username,
+            CreatedByEmail = product.CreatedBy.Email,
+            CreatedAt = product.CreatedAt,
+            ModifiedAt = product.ModifiedAt
         };
     }
 
-    public static Product ToEntity(this CreateProductDto dto)
+    public static Product ToEntity(this CreateProductDto dto, long createdByUserId)
     {
         return new Product
         {
@@ -26,7 +31,9 @@ public static class ProductMappings
             ShortDescription = dto.ShortDescription,
             Price = dto.Price,
             ImageUrl = dto.ImageUrl,
-            ProductType = dto.ProductType
+            ProductType = dto.ProductType,
+            CreatedByUserId = createdByUserId,
+            CreatedAt = DateTime.UtcNow
         };
     }
 

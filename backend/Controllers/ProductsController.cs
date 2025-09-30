@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using backend.Data;
 using backend.Models;
@@ -42,10 +44,37 @@ public class ProductsController : ControllerBase
         return Ok(result.Data);
     }
 
+    [HttpGet("my-products")]
+    [Authorize] // Require authentication to see own products
+    public async Task<IActionResult> GetMyProducts([FromQuery] PaginationRequest request)
+    {
+        // Get current user ID from JWT claims
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim == null || !long.TryParse(userIdClaim.Value, out long userId))
+        {
+            return Unauthorized(new { error = "Invalid user authentication" });
+        }
+
+        var result = await this.productService.GetProductsByUserAsync(userId, request);
+
+        if (!result.IsSuccess)
+            return BadRequest(new { error = result.ErrorMessage });
+
+        return Ok(result.Data);
+    }
+
     [HttpPost]
+    [Authorize] // Require authentication for creating products
     public async Task<IActionResult> AddProduct([FromBody] CreateProductDto product)
     {
-        var result = await this.productService.AddProductAsync(product);
+        // Get current user ID from JWT claims
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim == null || !long.TryParse(userIdClaim.Value, out long userId))
+        {
+            return Unauthorized(new { error = "Invalid user authentication" });
+        }
+
+        var result = await this.productService.AddProductAsync(product, userId);
 
         if (!result.IsSuccess)
             return BadRequest(new { error = result.ErrorMessage });
@@ -54,23 +83,51 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize] // Require authentication for updating products
     public async Task<IActionResult> UpdateProduct(long id, [FromBody] UpdateProductDto product)
     {
-        var result = await this.productService.UpdateProductAsync(id, product);
+        // Get current user ID from JWT claims
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim == null || !long.TryParse(userIdClaim.Value, out long userId))
+        {
+            return Unauthorized(new { error = "Invalid user authentication" });
+        }
+
+        var result = await this.productService.UpdateProductAsync(id, product, userId);
 
         if (!result.IsSuccess)
+        {
+            if (result.ErrorMessage == "Product not found")
+                return NotFound(new { error = result.ErrorMessage });
+            if (result.ErrorMessage == "You can only modify your own products")
+                return Forbid(result.ErrorMessage);
             return BadRequest(new { error = result.ErrorMessage });
+        }
 
         return Ok(result.Data);
     }
 
     [HttpDelete("{id}")]
+    [Authorize] // Require authentication for deleting products
     public async Task<IActionResult> DeleteProduct(long id)
     {
-        var result = await this.productService.DeleteProductAsync(id);
+        // Get current user ID from JWT claims
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim == null || !long.TryParse(userIdClaim.Value, out long userId))
+        {
+            return Unauthorized(new { error = "Invalid user authentication" });
+        }
+
+        var result = await this.productService.DeleteProductAsync(id, userId);
 
         if (!result.IsSuccess)
-            return NotFound(new { error = result.ErrorMessage });
+        {
+            if (result.ErrorMessage == "Product not found")
+                return NotFound(new { error = result.ErrorMessage });
+            if (result.ErrorMessage == "You can only delete your own products")
+                return Forbid(result.ErrorMessage);
+            return BadRequest(new { error = result.ErrorMessage });
+        }
 
         return NoContent();
     }

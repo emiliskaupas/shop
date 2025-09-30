@@ -31,10 +31,16 @@ public class CartController : ControllerBase
     [HttpPost("{userId}/items")]
     public async Task<IActionResult> AddToCart(long userId, [FromBody] AddToCartRequestDto request)
     {
+        // Log request details for debugging
+        Console.WriteLine($"AddToCart: userId={userId}, productId={request.ProductId}, quantity={request.Quantity}");
+        
         var result = await this.cartService.AddToCartAsync(userId, request.ProductId, request.Quantity);
 
         if (!result.IsSuccess)
+        {
+            Console.WriteLine($"AddToCart failed: {result.ErrorMessage}");
             return BadRequest(new { error = result.ErrorMessage });
+        }
 
         return Ok(result.Data);
     }

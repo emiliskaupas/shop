@@ -18,7 +18,8 @@ public class CartService : BaseService
         try
         {
             var cartItems = await shopContext.CartItems
-                .Include(ci => ci.Product)
+                .Include(ci => ci.Product!)
+                    .ThenInclude(p => p.CreatedBy)
                 .Where(ci => ci.UserId == userId)
                 .ToListAsync();
 
@@ -35,21 +36,34 @@ public class CartService : BaseService
     {
         try
         {
+            Console.WriteLine($"CartService.AddToCartAsync: userId={userId}, productId={productId}, quantity={quantity}");
+            
             // Validate inputs
             var quantityValidation = quantity.ValidateRange(1, 100, "Quantity");
             if (!quantityValidation.IsSuccess)
+            {
+                Console.WriteLine($"Quantity validation failed: {quantityValidation.ErrorMessage}");
                 return Result<CartItemDto>.Failure(quantityValidation.ErrorMessage!);
+            }
 
             // Check if product exists
             var product = await shopContext.Products.FindAsync(productId);
             if (product == null)
+            {
+                Console.WriteLine($"Product not found: productId={productId}");
                 return Result<CartItemDto>.Failure("Product not found");
+            }
 
             // Check if user exists
             var user = await shopContext.Users.FindAsync(userId);
             if (user == null)
+            {
+                Console.WriteLine($"User not found: userId={userId}");
                 return Result<CartItemDto>.Failure("User not found");
+            }
 
+            Console.WriteLine($"Validation passed. Creating/updating cart item...");
+            
             // Check if item already exists in cart
             var existingCartItem = await shopContext.CartItems
                 .FirstOrDefaultAsync(ci => ci.UserId == userId && ci.ProductId == productId);
@@ -60,10 +74,17 @@ public class CartService : BaseService
                 existingCartItem.Quantity += quantity;
                 await shopContext.SaveChangesAsync();
                 
-                // Reload with product information
+                // Reload with product and user information
                 await shopContext.Entry(existingCartItem)
                     .Reference(ci => ci.Product)
                     .LoadAsync();
+                    
+                if (existingCartItem.Product != null)
+                {
+                    await shopContext.Entry(existingCartItem.Product)
+                        .Reference(p => p.CreatedBy)
+                        .LoadAsync();
+                }
                 
                 return Result<CartItemDto>.Success(existingCartItem.ToDto());
             }
@@ -80,10 +101,17 @@ public class CartService : BaseService
                 await shopContext.CartItems.AddAsync(newCartItem);
                 await shopContext.SaveChangesAsync();
                 
-                // Reload with product information
+                // Reload with product and user information
                 await shopContext.Entry(newCartItem)
                     .Reference(ci => ci.Product)
                     .LoadAsync();
+                    
+                if (newCartItem.Product != null)
+                {
+                    await shopContext.Entry(newCartItem.Product)
+                        .Reference(p => p.CreatedBy)
+                        .LoadAsync();
+                }
 
                 return Result<CartItemDto>.Success(newCartItem.ToDto());
             }
@@ -104,11 +132,16 @@ public class CartService : BaseService
                 return Result<CartItemDto>.Failure(quantityValidation.ErrorMessage!);
 
             var cartItem = await shopContext.CartItems
-                .Include(ci => ci.Product)
+                .Include(ci => ci.Product!)
+                    .ThenInclude(p => p.CreatedBy)
                 .FirstOrDefaultAsync(ci => ci.Id == cartItemId && ci.UserId == userId);
 
             if (cartItem == null)
                 return Result<CartItemDto>.Failure("Cart item not found");
+
+            // Check if user is trying to update quantity of their own product
+            if (cartItem.Product != null && cartItem.Product.CreatedByUserId == userId)
+                return Result<CartItemDto>.Failure("You cannot modify cart items containing your own products");
 
             cartItem.Quantity = quantity;
             await shopContext.SaveChangesAsync();

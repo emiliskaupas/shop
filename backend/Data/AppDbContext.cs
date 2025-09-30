@@ -27,6 +27,14 @@ public class AppDbContext : DbContext
             .HasForeignKey(ci => ci.ProductId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        // Configure User -> Products relationship (One-to-Many)
+        modelBuilder.Entity<Product>()
+            .HasOne(p => p.CreatedBy)
+            .WithMany()
+            .HasForeignKey(p => p.CreatedByUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.ConfigureEntities();
         modelBuilder.Seed();
     }
 }

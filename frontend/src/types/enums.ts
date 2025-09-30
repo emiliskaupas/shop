@@ -1,10 +1,10 @@
-// User roles enum matching backend
+// User roles enum
 export enum UserRole {
   Customer = 0,
   Admin = 1
 }
 
-// Product types enum matching backend
+// Product types enum 
 export enum ProductType {
   Electronics = 0,
   Clothing = 1,
@@ -18,7 +18,7 @@ export enum ProductType {
   Automotive = 9
 }
 
-// Notification types enum matching backend
+// Notification types enum
 export enum NotificationType {
   Info = 0,
   Success = 1,

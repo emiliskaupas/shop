@@ -7,55 +7,73 @@ using Shop.Shared.Validation;
 using Shop.Shared.Notifications;
 using Microsoft.EntityFrameworkCore;
 using backend.Mapping;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using Microsoft.Extensions.Configuration;
+using BCrypt.Net;
 
 namespace backend.Services;
 
 public class AuthService : BaseService
 {
     private readonly INotificationService notificationService;
+    private readonly IConfiguration configuration;
 
-    public AuthService(AppDbContext shopContext, INotificationService notificationService) : base(shopContext)
+    public AuthService(AppDbContext shopContext, INotificationService notificationService, IConfiguration configuration) : base(shopContext)
     {
         this.notificationService = notificationService;
+        this.configuration = configuration;
     }
 
-    public async Task<Result<UserDto>> LoginAsync(LoginDto loginDto)
+    public async Task<Result<LoginResponseDto>> LoginAsync(LoginDto loginDto)
     {
         try
         {
             // Validate input using your existing validation extensions
             var emailValidation = loginDto.Email.ValidateNotEmpty("Email");
             if (!emailValidation.IsSuccess)
-                return Result<UserDto>.Failure(emailValidation.ErrorMessage!);
+                return Result<LoginResponseDto>.Failure(emailValidation.ErrorMessage!);
 
             var passwordValidation = loginDto.Password.ValidateNotEmpty("Password");
             if (!passwordValidation.IsSuccess)
-                return Result<UserDto>.Failure(passwordValidation.ErrorMessage!);
+                return Result<LoginResponseDto>.Failure(passwordValidation.ErrorMessage!);
 
             // Find user by email
             var user = await shopContext.Users
                 .FirstOrDefaultAsync(u => u.Email == loginDto.Email);
 
             if (user == null)
-                return Result<UserDto>.Failure("Invalid email or password");
+                return Result<LoginResponseDto>.Failure("Invalid email or password");
 
             // In production, use proper password hashing (BCrypt, etc.)
-            if (user.PasswordHash != loginDto.Password)
-                return Result<UserDto>.Failure("Invalid email or password");
+            if (!BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
+                return Result<LoginResponseDto>.Failure("Invalid email or password");
+
+            // Generate JWT token
+            var token = GenerateJwtToken(user);
+            var expiresAt = DateTime.UtcNow.AddHours(24); // 24 hour expiration
 
             // Map to DTO using existing pattern
             var userDto = user.ToDto();
+            var loginResponse = new LoginResponseDto
+            {
+                User = userDto,
+                Token = token,
+                ExpiresAt = expiresAt
+            };
 
             // Trigger login notification
             await notificationService.SendNotificationAsync(
                 $"User {user.Username} logged in successfully", 
                 NotificationType.Success);
 
-            return Result<UserDto>.Success(userDto);
+            return Result<LoginResponseDto>.Success(loginResponse);
         }
         catch
         {
-            return Result<UserDto>.Failure("Authentication failed");
+            return Result<LoginResponseDto>.Failure("Authentication failed");
         }
     }
 
@@ -117,5 +135,30 @@ public class AuthService : BaseService
             Console.WriteLine($"Stack trace: {ex.StackTrace}");
             return Result<UserDto>.Failure($"Registration failed: {ex.Message}");
         }
+    }
+
+    private string GenerateJwtToken(User user)
+    {
+        var jwtKey = configuration["JwtSettings:SecretKey"] ?? "your-very-long-secret-key-that-should-be-at-least-256-bits-long-for-security-purposes";
+        var key = Encoding.ASCII.GetBytes(jwtKey);
+        
+        var claims = new[]
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.Name, user.Username),
+            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.Role, user.Role.ToString())
+        };
+
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(claims),
+            Expires = DateTime.UtcNow.AddHours(24),
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+        };
+
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        return tokenHandler.WriteToken(token);
     }
 }
