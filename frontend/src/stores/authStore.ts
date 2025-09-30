@@ -8,7 +8,7 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
-  isInitialized: boolean; // NEW
+  isInitialized: boolean;
 }
 
 interface AuthActions {
@@ -46,7 +46,7 @@ export const useAuthStore = create<AuthState & AuthActions>((set, get) => ({
           isAuthenticated: true,
           isLoading: false,
           error: null,
-          isInitialized: true, // ✅ ensure we’re initialized after login
+          isInitialized: true, //ensure we’re initialized after login
         });
 
         return true;

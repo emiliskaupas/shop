@@ -147,3 +147,6 @@ C:\Users\Emilis\Desktop\shop\backend\obj\Debug\net8.0\backend.pdb
 C:\Users\Emilis\Desktop\shop\backend\obj\Debug\net8.0\backend.genruntimeconfig.cache
 C:\Users\Emilis\Desktop\shop\backend\obj\Debug\net8.0\ref\backend.dll
 C:\Users\Emilis\Desktop\shop\backend\bin\Debug\net8.0\BCrypt.Net-Next.dll
+C:\Users\Emilis\Desktop\shop\backend\bin\Debug\net8.0\backend.staticwebassets.endpoints.json
+C:\Users\Emilis\Desktop\shop\backend\obj\Debug\net8.0\staticwebassets.build.endpoints.json
+C:\Users\Emilis\Desktop\shop\backend\obj\Debug\net8.0\staticwebassets\msbuild.backend.Microsoft.AspNetCore.StaticWebAssetEndpoints.props

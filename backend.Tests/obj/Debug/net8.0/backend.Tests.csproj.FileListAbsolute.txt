@@ -163,3 +163,4 @@ C:\Users\Emilis\Desktop\shop\backend.tests\obj\Debug\net8.0\refint\backend.Tests
 C:\Users\Emilis\Desktop\shop\backend.tests\obj\Debug\net8.0\backend.Tests.pdb
 C:\Users\Emilis\Desktop\shop\backend.tests\obj\Debug\net8.0\backend.Tests.genruntimeconfig.cache
 C:\Users\Emilis\Desktop\shop\backend.tests\obj\Debug\net8.0\ref\backend.Tests.dll
+C:\Users\Emilis\Desktop\shop\backend.Tests\bin\Debug\net8.0\BCrypt.Net-Next.dll

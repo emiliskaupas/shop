@@ -32,7 +32,7 @@ namespace backend.Tests.Services
                     Id = 1,
                     Username = "admin",
                     Email = "admin@shop.com",
-                    PasswordHash = "admin123",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin123"),
                     Role = UserRole.Admin
                 },
                 new User
@@ -40,7 +40,7 @@ namespace backend.Tests.Services
                     Id = 2,
                     Username = "john_doe",
                     Email = "john.doe@example.com",
-                    PasswordHash = "customer123",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("customer123"),
                     Role = UserRole.Customer
                 }
             );
